@@ -25,13 +25,9 @@ package com.bolutions.webserver;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Date;
-import java.util.Enumeration;
 
-//import com.bolutions.webserver.R;
+import com.bolutions.webserver.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -39,14 +35,12 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -55,11 +49,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-
-
 public class StartActivity extends Activity {
-    private static final String TAG = null;
-	private ToggleButton mToggleButton;
+    private ToggleButton mToggleButton;
     private EditText port;
     private Server server;
     private static TextView mLog;
@@ -86,6 +77,35 @@ public class StartActivity extends Activity {
         mLog = (TextView) findViewById(R.id.log);
         mScroll = (ScrollView) findViewById(R.id.ScrollView01);
         
+        String pfad = "/sdcard/com.bolutions.webserver/";
+        
+        boolean exists = (new File(pfad)).exists();
+        try {
+	        if (!exists) {
+	        	(new File(pfad)).mkdir();
+	         	BufferedWriter bout = new BufferedWriter(new FileWriter(pfad+"index.html"));
+	         	bout.write("<html><head><title>Android Webserver powered by bolutions.com</title>");
+	         	bout.write("</head>");
+	         	bout.write("<body>Willkommen auf dem Android Webserver powered by <a href=\"http://www.bolutions.com\">bolutions.com</a>.");
+	         	bout.write("<br><br>Die HTML-Dateien liegen in /sdcard/com.bolutions.webserver/</body></html>");
+	         	bout.flush();
+	         	bout.close();
+	         	bout = new BufferedWriter(new FileWriter(pfad+"403.html"));
+	         	bout.write("<html><head><title>Error 403 powered by bolutions.com</title>");
+	         	bout.write("</head>");
+	         	bout.write("<body>403 - Forbidden</body></html>");
+	         	bout.flush();
+	         	bout.close();
+	         	bout = new BufferedWriter(new FileWriter(pfad+"404.html"));
+	         	bout.write("<html><head><title>Error 404 powered by bolutions.com</title>");
+	         	bout.write("</head>");
+	         	bout.write("<body>404 - File not found</body></html>");
+	         	bout.flush();
+	         	bout.close();
+	        }
+        }catch (Exception e) {
+        	Log.v("ERROR",e.getMessage());
+        }
         mToggleButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
 				if( mToggleButton.isChecked() ) {
@@ -124,17 +144,20 @@ public class StartActivity extends Activity {
                ( i >> 24   & 0xFF);
     }
     
-
     private void startServer(int port) {
     	try {
-    		String ipAddress = "0.0.0.0";
+    		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+    		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
     		
-            AssetManager assetManager = getAssets();
-            
+    		String ipAddress = intToIp(wifiInfo.getIpAddress());
 
+    		if( wifiInfo.getSupplicantState() != SupplicantState.COMPLETED) {
+    			new AlertDialog.Builder(this).setTitle("Error").setMessage("Please connect to a WIFI-network for starting the webserver.").setPositiveButton("OK", null).show();
+    			throw new Exception("Please connect to a WIFI-network.");
+    		}
             
     		log("Starting server "+ipAddress + ":" + port + ".");
-		    server = new Server("0.0.0.0",port,mHandler, assetManager);
+		    server = new Server(ipAddress,port,mHandler);
 		    server.start();
 		    
 	        Intent i = new Intent(this, StartActivity.class);
