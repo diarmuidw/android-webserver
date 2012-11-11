@@ -38,8 +38,45 @@ class ServerHandler extends Thread {
     
   }
 
-  public void run() {
+  @Override
+public void run() {
 	String dokument = "";
+	
+	
+
+    try {
+      in = new BufferedReader(new InputStreamReader(toClient.getInputStream()));
+
+      // Receive data
+      while (true) {
+        String s = in.readLine().trim();
+
+        if (s.equals("")) {
+          break;
+        }
+        
+        if (s.substring(0, 3).equals("GET")) {
+         int leerstelle = s.indexOf(" HTTP/");
+         dokument = s.substring(5,leerstelle);
+         dokument = dokument.replaceAll("[/]+","/");
+        }
+      }
+    }
+    catch (Exception e) {
+     Server.remove(toClient);
+     try
+{
+     toClient.close();
+}
+     catch (Exception ex){}
+    }
+    
+	if (dokument.equals("")) dokument = "index.html";
+
+	// Don't allow directory traversal
+	if (dokument.indexOf("..") != -1) dokument = "403.html";
+
+
 
 	String headerBase = "HTTP/1.1 %code%\n"+
 	"Server: Bolutions/1\n"+
@@ -55,7 +92,7 @@ class ServerHandler extends Thread {
     
     InputStream input;
     try{
-    	input = assetManager.open("index.html");
+    	input = assetManager.open(dokument);
 
     	
   	  BufferedInputStream in = new BufferedInputStream(input);
@@ -74,17 +111,8 @@ class ServerHandler extends Thread {
   	  out.write(header.getBytes());
   	  out.write(tempOut.toByteArray());
   	  out.flush();
-    }catch (Exception ex)
-    {
-    	
-    	
-    	
-    }
-    
-
       Server.remove(toClient);
-      try {
-		toClient.close();
+	  toClient.close();
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();

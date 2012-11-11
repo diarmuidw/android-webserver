@@ -25,6 +25,7 @@ package com.bolutions.webserver;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -135,6 +136,22 @@ public class StartActivity extends Activity {
 		    server = new Server(ipAddress,port,mHandler, assetManager);
 		    server.start();
 		    
+
+				try
+				{
+					log("Starting NanoHTTPD server");
+					
+					new HelloServer();
+				}
+				catch( IOException ioe )
+				{
+					log("error Starting NanoHTTPD server");
+				}
+				log( "Listening on port 8000. Hit Enter to stop.\n" );
+				
+
+		    
+		    
 	        Intent i = new Intent(this, StartActivity.class);
 	        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, 0);
 
@@ -148,4 +165,9 @@ public class StartActivity extends Activity {
     	}
     	
     }
+    
+    
+    
+    
+
 }
