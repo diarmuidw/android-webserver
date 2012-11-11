@@ -136,18 +136,18 @@ public class StartActivity extends Activity {
 		    server = new Server(ipAddress,port,mHandler, assetManager);
 		    server.start();
 		    
-
-				try
-				{
-					log("Starting NanoHTTPD server");
-					
-					new HelloServer();
-				}
-				catch( IOException ioe )
-				{
-					log("error Starting NanoHTTPD server");
-				}
-				log( "Listening on port 8000. Hit Enter to stop.\n" );
+	
+			try
+			{
+				log("Starting NanoHTTPD server");
+				
+				new HTTPFileServer(assetManager);
+			}
+			catch( IOException ioe )
+			{
+				log("error Starting NanoHTTPD server");
+			}
+			log( "Listening on port 8000. Hit Enter to stop.\n" );
 				
 
 		    

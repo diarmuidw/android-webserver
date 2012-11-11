@@ -207,6 +207,7 @@ public class NanoHTTPD
 	public static final String
 		MIME_PLAINTEXT = "text/plain",
 		MIME_HTML = "text/html",
+		MIME_JPG = "image/jpeg",
 		MIME_DEFAULT_BINARY = "application/octet-stream",
 		MIME_XML = "text/xml";
 

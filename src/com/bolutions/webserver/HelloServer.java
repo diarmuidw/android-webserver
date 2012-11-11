@@ -3,12 +3,14 @@ package com.bolutions.webserver;
 
 import java.io.*;
 import java.util.*;
-
+import android.util.Log;
 
 
 
 public class HelloServer extends NanoHTTPD
 {
+	private static final String TAG = "HelloServer";
+	
 	public HelloServer() throws IOException
 	{
 		super(8000, new File("."));
@@ -16,7 +18,9 @@ public class HelloServer extends NanoHTTPD
 
 	public Response serve( String uri, String method, Properties header, Properties parms, Properties files )
 	{
-		System.out.println( method + " '" + uri + "' " );
+		Log.d(TAG,  method + " '" + uri + "' ");
+		
+		
 		String msg = "<html><body><h1>Hello server</h1>\n";
 		if ( parms.getProperty("username") == null )
 			msg +=
@@ -31,18 +35,4 @@ public class HelloServer extends NanoHTTPD
 	}
 
 
-	public static void main( String[] args )
-	{
-		try
-		{
-			new HelloServer();
-		}
-		catch( IOException ioe )
-		{
-			System.err.println( "Couldn't start server:\n" + ioe );
-			System.exit( -1 );
-		}
-		System.out.println( "Listening on port 8080. Hit Enter to stop.\n" );
-		try { System.in.read(); } catch( Throwable t ) {};
-	}
 }
