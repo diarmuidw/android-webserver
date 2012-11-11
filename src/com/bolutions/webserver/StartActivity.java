@@ -130,11 +130,9 @@ public class StartActivity extends Activity {
     		String ipAddress = "0.0.0.0";
     		
             AssetManager assetManager = getAssets();
-            
 
-            
     		log("Starting server "+ipAddress + ":" + port + ".");
-		    server = new Server("0.0.0.0",port,mHandler, assetManager);
+		    server = new Server(ipAddress,port,mHandler, assetManager);
 		    server.start();
 		    
 	        Intent i = new Intent(this, StartActivity.class);
